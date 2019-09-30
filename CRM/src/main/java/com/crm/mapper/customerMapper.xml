@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crm.dao.CustomerDao">
+  <resultMap id="BaseResultMap" type="com.crm.model.Customer">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="firstname" jdbcType="VARCHAR" property="firstname" />
+    <result column="lastname" jdbcType="VARCHAR" property="lastname" />
+  </resultMap>
+  <resultMap id="withOffice" type="com.crm.model.Customer">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="firstname" jdbcType="VARCHAR" property="firstname" />
+    <result column="lastname" jdbcType="VARCHAR" property="lastname" />
+     <collection property="offices" ofType="com.crm.model.Office" javaType="list">
+        <result column="oid" jdbcType="INTEGER" property="id" />
+    	<result column="name" jdbcType="VARCHAR" property="name" />
+    	<result column="address" jdbcType="VARCHAR" property="address" />
+    </collection>
+  </resultMap>  
+    
+  <sql id="Base_Column_List">
+    id, firstname, lastname
+  </sql>
+  
+  <select id="selectAllwithOffice" resultMap="withOffice">
+    select 	u.id as id, 
+    		u.firstname as firstname,
+    		u.lastname as lastname,
+    		o.id as oid,
+    		o.name as name,
+        	o.address as address from customer u 
+    	left outer join office_customer oc on u.id=oc.cid 
+    	left outer join office o on o.id=oc.oid order by id;
+  </select>
+  
+  <select id="selectByOffice" parameterType="java.lang.Integer" resultMap="withOffice">
+    select 	u.id as id, 
+    		u.firstname as firstname,
+    		u.lastname as lastname,
+    		o.id as oid,
+    		o.name as name,
+        o.address as address from customer u  
+    	left outer join office_customer oc on u.id=oc.cid 
+    	left outer join office o on o.id=oc.oid where u.id in(select cid from office_customer where oid = #{id,jdbcType=INTEGER}) order by id ;
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="withOffice">
+    select 	u.id as id, 
+    		u.firstname as firstname,
+    		u.lastname as lastname,
+    		o.id as oid,
+    		o.name as name,
+        	o.address as address from customer u
+    	left outer join office_customer oc on u.id=oc.cid 
+    	left outer join office o on o.id=oc.oid where u.id = #{id,jdbcType=INTEGER} order by id;
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from customer
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.crm.model.Customer">
+    insert into customer (id, firstname, lastname
+      )
+    values (#{id,jdbcType=INTEGER}, #{firstname,jdbcType=VARCHAR}, #{lastname,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.crm.model.Customer">
+    insert into customer
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="firstname != null">
+        firstname,
+      </if>
+      <if test="lastname != null">
+        lastname,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="firstname != null">
+        #{firstname,jdbcType=VARCHAR},
+      </if>
+      <if test="lastname != null">
+        #{lastname,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.crm.model.Customer">
+    update customer
+    <set>
+      <if test="firstname != null">
+        firstname = #{firstname,jdbcType=VARCHAR},
+      </if>
+      <if test="lastname != null">
+        lastname = #{lastname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.crm.model.Customer">
+    update customer
+    set firstname = #{firstname,jdbcType=VARCHAR},
+      lastname = #{lastname,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from customer
+  </select>
+</mapper>

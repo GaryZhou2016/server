@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.crm.dao.OfficeCustomerDao">
+  <resultMap id="BaseResultMap" type="com.crm.model.OfficeCustomer">
+    <result column="cid" jdbcType="INTEGER" property="cid" />
+    <result column="oid" jdbcType="INTEGER" property="oid" />
+  </resultMap>
+  <insert id="insert" parameterType="com.crm.model.OfficeCustomer">
+    insert into office_customer (cid, oid)
+    values (#{cid,jdbcType=INTEGER}, #{oid,jdbcType=INTEGER})
+  </insert>
+  
+  <delete id="delete" parameterType="com.crm.model.OfficeCustomer" >
+    delete from office_customer where oid = #{oid} and cid = #{cid}
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.crm.model.OfficeCustomer">
+    insert into office_customer
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="cid != null">
+        cid,
+      </if>
+      <if test="oid != null">
+        oid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="cid != null">
+        #{cid,jdbcType=INTEGER},
+      </if>
+      <if test="oid != null">
+        #{oid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+</mapper>
